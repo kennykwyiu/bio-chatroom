@@ -79,11 +79,7 @@ public class ChatServer {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            try {
-                serverSocket.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            close();
         }
     }
 }
