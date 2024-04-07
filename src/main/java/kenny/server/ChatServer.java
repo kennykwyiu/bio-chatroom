@@ -31,7 +31,13 @@ public class ChatServer {
         }
     }
 
-    public void removeClient(Socket socket) {
-
+    public void removeClient(Socket socket) throws IOException {
+        if (socket != null) {
+            int port = socket.getPort();
+            if (connectedClients.containsKey(port)) {
+                connectedClients.get(port).close();
+            }
+            connectedClients.remove(port);
+    }
     }
 }
