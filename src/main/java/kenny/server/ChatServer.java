@@ -52,6 +52,10 @@ public class ChatServer {
         }
     }
 
+    public boolean readyToQuit(String msg) {
+        return QUIT.equals(msg);
+    }
+
     public void close() {
         if (serverSocket != null) {
             try {
