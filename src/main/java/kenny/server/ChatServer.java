@@ -39,6 +39,16 @@ public class ChatServer {
             }
             connectedClients.remove(port);
             System.out.println("Client[" + port + "] is disconnected");
+        }
     }
+
+    public void forwardMessage(Socket socket, String fwdMsg) throws IOException {
+        for (Integer id : connectedClients.keySet()) {
+            if (!id.equals(socket.getPort())) {
+                Writer writer = connectedClients.get(id);
+                writer.write(fwdMsg);
+                writer.flush();
+            }
+        }
     }
 }
