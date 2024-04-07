@@ -38,6 +38,7 @@ public class ChatServer {
                 connectedClients.get(port).close();
             }
             connectedClients.remove(port);
+            System.out.println("Client[" + port + "] is disconnected");
     }
     }
 }
