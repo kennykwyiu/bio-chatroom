@@ -51,4 +51,39 @@ public class ChatServer {
             }
         }
     }
+
+    public void close() {
+        if (serverSocket != null) {
+            try {
+                serverSocket.close();
+                System.out.println("Closing the serverSocket");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void start() {
+        try {
+            serverSocket = new ServerSocket(DEFAULT_PORT);
+            System.out.println("Server is started, serverSocket port: " + DEFAULT_PORT + "...");
+
+            while (true) {
+                // waiting for user to connect
+                Socket socket = serverSocket.accept();
+
+                // create ChatHandler thread
+
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                serverSocket.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }
