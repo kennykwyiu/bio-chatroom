@@ -1,8 +1,6 @@
 package kenny.client;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 public class ChatClient {
@@ -31,6 +29,43 @@ public class ChatClient {
 
     public boolean readyToQuit(String msg) {
         return QUIT.equals(msg);
+    }
+
+    public void close() {
+        if (writer != null) {
+            try {
+                System.out.println("Closing the socket");
+                writer.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void start() {
+        try {
+            socket = new Socket(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
+
+            reader = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream())
+            );
+            writer = new BufferedWriter(
+                    new OutputStreamWriter(socket.getOutputStream())
+            );
+
+            // handle user input
+
+            // read the msg fwded from server
+            String msg = null;
+            while ((msg = receive()) != null) {
+                System.out.println(msg);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            close();
+        }
     }
 
 }
