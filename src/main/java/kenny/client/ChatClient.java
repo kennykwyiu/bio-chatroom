@@ -66,6 +66,12 @@ public class ChatClient {
         } finally {
             close();
         }
+
+
     }
 
+    public static void main(String[] args) {
+        ChatClient chatClient = new ChatClient();
+        chatClient.start();
+    }
 }
