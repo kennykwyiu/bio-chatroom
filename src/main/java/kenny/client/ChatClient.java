@@ -54,6 +54,7 @@ public class ChatClient {
             );
 
             // handle user input
+            new Thread(new UserInputHandler(this)).start();
 
             // read the msg fwded from server
             String msg = null;
