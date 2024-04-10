@@ -8,16 +8,22 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ChatServer {
+    public static final int N_THREADS = 10;
     private int DEFAULT_PORT = 8888;
     private final String QUIT = "quit";
+    private ExecutorService executorService;
 
     private ServerSocket serverSocket;
     private Map<Integer, Writer> connectedClients;
 
     public ChatServer() {
-        connectedClients = new HashMap<Integer, Writer>();
+        executorService = Executors.newFixedThreadPool(N_THREADS);
+        connectedClients = new HashMap<>();
     }
 
     public synchronized void addClient(Socket socket) throws IOException {
@@ -77,7 +83,7 @@ public class ChatServer {
                 Socket socket = serverSocket.accept();
 
                 // create ChatHandler thread
-                new Thread(new ChatHandler(this, socket)).start();
+                executorService.execute(new ChatHandler(this, socket));
             }
 
         } catch (IOException e) {
