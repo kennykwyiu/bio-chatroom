@@ -7,4 +7,10 @@ interface FileCopyRunner {
 }
 public class FileCopyDemo {
 
+    public static void main(String[] args) {
+        FileCopyRunner noBufferStreamCopy;
+        FileCopyRunner bufferStreamCopy;
+        FileCopyRunner nioBufferCopy;
+        FileCopyRunner noTransferCopy;
+    }
 }
