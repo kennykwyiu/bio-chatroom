@@ -1,6 +1,8 @@
 package kenny.nio_file_copy;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 interface FileCopyRunner {
     void copyFile(File source, File target);
@@ -70,7 +72,36 @@ public class FileCopyDemo {
             }
         };
 
-        FileCopyRunner nioBufferCopy;
+        FileCopyRunner nioBufferCopy = new FileCopyRunner() {
+            @Override
+            public void copyFile(File source, File target) {
+                FileChannel fileIn = null;
+                FileChannel fileOut = null;
+
+                try {
+                    fileIn= new FileInputStream(source).getChannel();
+                    fileOut = new FileOutputStream(target).getChannel();
+
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
+                    while (fileIn.read(buffer) != -1) {
+                        buffer.flip();
+                        while (buffer.hasRemaining()) {
+                            fileOut.write(buffer);
+                        }
+                        buffer.clear();
+                    }
+
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    close(fileIn);
+                    close(fileOut);
+                }
+
+            }
+        };
 
         FileCopyRunner noTransferCopy;
     }
