@@ -43,7 +43,32 @@ public class FileCopyDemo {
             }
         };
 
-        FileCopyRunner bufferStreamCopy;
+        FileCopyRunner bufferStreamCopy = new FileCopyRunner() {
+            @Override
+            public void copyFile(File source, File target) {
+                InputStream fileIn = null;
+                OutputStream fileOut = null;
+
+                try {
+                    fileIn = new BufferedInputStream(new FileInputStream(source));
+                    fileOut = new BufferedOutputStream(new FileOutputStream(target));
+
+                    byte[] buffer = new byte[1024];
+
+                    int result;
+                    while ((result = fileIn.read(buffer, 0, buffer.length)) != -1) {
+                        fileOut.write(buffer, 0, result);
+                    }
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    close(fileIn);
+                    close(fileOut);
+                }
+            }
+        };
 
         FileCopyRunner nioBufferCopy;
 
