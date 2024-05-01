@@ -7,6 +7,7 @@ import java.nio.channels.FileChannel;
 interface FileCopyRunner {
     void copyFile(File source, File target);
 }
+
 public class FileCopyDemo {
 
     private static void close(Closeable closeable) {
@@ -31,9 +32,9 @@ public class FileCopyDemo {
                     fileOut = new FileOutputStream(target);
 
                     int result;
-                     while ((result = fileIn.read()) != -1) {
-                         fileOut.write(result);
-                     }
+                    while ((result = fileIn.read()) != -1) {
+                        fileOut.write(result);
+                    }
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
                 } catch (IOException e) {
@@ -79,7 +80,7 @@ public class FileCopyDemo {
                 FileChannel fileOut = null;
 
                 try {
-                    fileIn= new FileInputStream(source).getChannel();
+                    fileIn = new FileInputStream(source).getChannel();
                     fileOut = new FileOutputStream(target).getChannel();
 
                     ByteBuffer buffer = ByteBuffer.allocate(1024);
@@ -103,6 +104,31 @@ public class FileCopyDemo {
             }
         };
 
-        FileCopyRunner noTransferCopy;
+        FileCopyRunner noTransferCopy = new FileCopyRunner() {
+            @Override
+            public void copyFile(File source, File target) {
+                FileChannel fileIn = null;
+                FileChannel fileOut = null;
+
+                try {
+                    fileIn = new FileInputStream(source).getChannel();
+                    fileOut = new FileOutputStream(target).getChannel();
+
+                    long transferred = 0L;
+                    long size = fileIn.size();
+                    while (transferred != size) {
+                        transferred += fileIn.transferTo(0, size, fileOut);
+                    }
+
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    close(fileIn);
+                    close(fileOut);
+                }
+            }
+        };
     }
 }
