@@ -10,6 +10,18 @@ interface FileCopyRunner {
 
 public class FileCopyDemo {
 
+    private static final int ROUNDS = 5;
+    private static void benchmark(FileCopyRunner test, File source, File target) {
+        long elapsed = 0L;
+        for (int i = 0; i < ROUNDS; i++) {
+            long startTime = System.currentTimeMillis();
+            test.copyFile(source, target);
+            elapsed += System.currentTimeMillis() - startTime;
+            target.delete();
+        }
+        System.out.println(test + ": " + elapsed / ROUNDS);
+    }
+
     private static void close(Closeable closeable) {
         if (closeable != null) {
             try {
