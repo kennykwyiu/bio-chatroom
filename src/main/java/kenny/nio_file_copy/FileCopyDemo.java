@@ -11,6 +11,7 @@ interface FileCopyRunner {
 public class FileCopyDemo {
 
     private static final int ROUNDS = 5;
+
     private static void benchmark(FileCopyRunner test, File source, File target) {
         long elapsed = 0L;
         for (int i = 0; i < ROUNDS; i++) {
@@ -56,6 +57,7 @@ public class FileCopyDemo {
                     close(fileOut);
                 }
             }
+
             @Override
             public String toString() {
                 return "noBufferStreamCopy";
@@ -104,7 +106,7 @@ public class FileCopyDemo {
                     fileIn = new FileInputStream(source).getChannel();
                     fileOut = new FileOutputStream(target).getChannel();
 
-                    ByteBuffer buffer = ByteBuffer.allocate(1024);
+                    ByteBuffer buffer = ByteBuffer.allocate(3072);
                     while (fileIn.read(buffer) != -1) {
                         buffer.flip();
                         while (buffer.hasRemaining()) {
@@ -121,7 +123,6 @@ public class FileCopyDemo {
                     close(fileIn);
                     close(fileOut);
                 }
-
             }
 
             @Override
@@ -130,7 +131,7 @@ public class FileCopyDemo {
             }
         };
 
-        FileCopyRunner noTransferCopy = new FileCopyRunner() {
+        FileCopyRunner nioTransferCopy = new FileCopyRunner() {
             @Override
             public void copyFile(File source, File target) {
                 FileChannel fileIn = null;
@@ -158,8 +159,33 @@ public class FileCopyDemo {
 
             @Override
             public String toString() {
-                return "noTransferCopy";
+                return "nioTransferCopy";
             }
         };
+        File smallFile = new File("src/main/java/kenny/nio_file_copy/smallFile/PRUChoice Home App Form_0322_eForm.pdf");
+        File smallFileCopy = new File("src/main/java/kenny/nio_file_copy/smallFile-copy/test.txt");
+        System.out.println("---Copying small file---");
+        benchmark(noBufferStreamCopy, smallFile, smallFileCopy);
+        benchmark(bufferStreamCopy, smallFile, smallFileCopy);
+        benchmark(nioBufferCopy, smallFile, smallFileCopy);
+        benchmark(nioTransferCopy, smallFile, smallFileCopy);
+
+        File bigFile = new File("src/main/java/kenny/nio_file_copy/bigFile/092150_Cloud Dye.ai");
+        File bigFileCopy = new File("src/main/java/kenny/nio_file_copy/bigFile-copy/test.txt");
+        System.out.println("---Copying big file---");
+        benchmark(bufferStreamCopy, bigFile, bigFileCopy);
+        benchmark(nioBufferCopy, bigFile, bigFileCopy);
+        benchmark(nioTransferCopy, bigFile, bigFileCopy);
+//        benchmark(noBufferStreamCopy, bigFile, bigFileCopy);
+
+        File hughFile = new File("src/main/java/kenny/nio_file_copy/hughFile/.mp4");
+        File hughFileCopy = new File("src/main/java/kenny/nio_file_copy/hughFile-copy/test.txt");
+        System.out.println("---Copying hugh file---");
+        benchmark(bufferStreamCopy, hughFile, hughFileCopy);
+        benchmark(nioBufferCopy, hughFile, hughFileCopy);
+        benchmark(nioTransferCopy, hughFile, hughFileCopy);
+//        benchmark(noBufferStreamCopy, bigFile, bigFileCopy);
     }
+
+
 }
