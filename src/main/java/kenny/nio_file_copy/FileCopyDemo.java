@@ -56,6 +56,10 @@ public class FileCopyDemo {
                     close(fileOut);
                 }
             }
+            @Override
+            public String toString() {
+                return "noBufferStreamCopy";
+            }
         };
 
         FileCopyRunner bufferStreamCopy = new FileCopyRunner() {
@@ -82,6 +86,11 @@ public class FileCopyDemo {
                     close(fileIn);
                     close(fileOut);
                 }
+            }
+
+            @Override
+            public String toString() {
+                return "bufferStreamCopy";
             }
         };
 
@@ -114,6 +123,11 @@ public class FileCopyDemo {
                 }
 
             }
+
+            @Override
+            public String toString() {
+                return "nioBufferCopy";
+            }
         };
 
         FileCopyRunner noTransferCopy = new FileCopyRunner() {
@@ -140,6 +154,11 @@ public class FileCopyDemo {
                     close(fileIn);
                     close(fileOut);
                 }
+            }
+
+            @Override
+            public String toString() {
+                return "noTransferCopy";
             }
         };
     }
