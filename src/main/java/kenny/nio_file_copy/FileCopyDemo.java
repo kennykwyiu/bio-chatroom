@@ -57,7 +57,6 @@ public class FileCopyDemo {
                     close(fileOut);
                 }
             }
-
             @Override
             public String toString() {
                 return "noBufferStreamCopy";
@@ -89,7 +88,6 @@ public class FileCopyDemo {
                     close(fileOut);
                 }
             }
-
             @Override
             public String toString() {
                 return "bufferStreamCopy";
@@ -106,7 +104,7 @@ public class FileCopyDemo {
                     fileIn = new FileInputStream(source).getChannel();
                     fileOut = new FileOutputStream(target).getChannel();
 
-                    ByteBuffer buffer = ByteBuffer.allocate(3072);
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
                     while (fileIn.read(buffer) != -1) {
                         buffer.flip();
                         while (buffer.hasRemaining()) {
@@ -124,7 +122,6 @@ public class FileCopyDemo {
                     close(fileOut);
                 }
             }
-
             @Override
             public String toString() {
                 return "nioBufferCopy";
@@ -156,7 +153,6 @@ public class FileCopyDemo {
                     close(fileOut);
                 }
             }
-
             @Override
             public String toString() {
                 return "nioTransferCopy";
