@@ -48,7 +48,6 @@ public class ChatServer {
                 }
                 selectionKeys.clear();
             }
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -57,6 +56,11 @@ public class ChatServer {
     }
 
     private void handles(SelectionKey key) {
+        // ACCEPT event - with client server connected
+        if (key.isAcceptable()) {
+
+        }
+        // READ event - clients send msg to server
     }
 
     private boolean readyToQuit(String msg) {
