@@ -17,6 +17,15 @@ public class ChatServer {
     private ByteBuffer readBuffer = ByteBuffer.allocate(BUFFER);
     private ByteBuffer writeBuffer = ByteBuffer.allocate(BUFFER);
     private Charset charset = StandardCharsets.UTF_8;
+    private int port;
+
+    public ChatServer() {
+        this.port = DEFAULT_PORT;
+    }
+
+    public ChatServer(int port) {
+        this.port = port;
+    }
 
     private void Start() {
 
