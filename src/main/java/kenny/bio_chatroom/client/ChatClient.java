@@ -1,4 +1,4 @@
-package kenny.client;
+package kenny.bio_chatroom.client;
 
 import java.io.*;
 import java.net.Socket;

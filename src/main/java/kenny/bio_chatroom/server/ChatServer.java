@@ -1,4 +1,4 @@
-package kenny.server;
+package kenny.bio_chatroom.server;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
