@@ -2,11 +2,14 @@ package kenny.nio_chatroom;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 public class ChatServer {
     private int DEFAULT_PORT = 8888;
@@ -28,7 +31,32 @@ public class ChatServer {
     }
 
     private void Start() {
+        try {
+            server = ServerSocketChannel.open();
+            server.configureBlocking(false);
+            server.socket().bind(new InetSocketAddress(port));
 
+            selector = Selector.open();
+            server.register(selector, SelectionKey.OP_ACCEPT);
+            System.out.println("Starting server, listening port: " + port + "...");
+
+            while (true) {
+                selector.select();
+                Set<SelectionKey> selectionKeys = selector.selectedKeys();
+                for (SelectionKey key : selectionKeys) {
+                    handles(key);
+                }
+                selectionKeys.clear();
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            close(selector);
+        }
+    }
+
+    private void handles(SelectionKey key) {
     }
 
     private boolean readyToQuit(String msg) {
