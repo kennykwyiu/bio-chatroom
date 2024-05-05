@@ -4,9 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
@@ -55,12 +53,39 @@ public class ChatServer {
         }
     }
 
-    private void handles(SelectionKey key) {
+    private void handles(SelectionKey key) throws IOException {
         // ACCEPT event - with client server connected
         if (key.isAcceptable()) {
-
+            SocketChannel client = (SocketChannel) key.channel();
+            client.configureBlocking(false);
+            client.register(selector, SelectionKey.OP_READ);
+            System.out.println("Client[" + getClientName(client) + "] is connected");
         }
         // READ event - clients send msg to server
+        else if (key.isReadable()) {
+            SocketChannel client = (SocketChannel) key.channel();
+            String fwdMsg = receive(client);
+            if (fwdMsg.isEmpty()) {
+                key.cancel();
+                selector.wakeup();
+            } else {
+                forwardMessage(client, fwdMsg);
+
+                // check client is quit or not?
+                if (readyToQuit(fwdMsg)) {
+                    key.cancel();
+                    selector.wakeup();
+                    System.out.println("Server[" + getClientName(client) + "] is disconnected");
+
+                }
+            }
+
+        }
+
+    }
+
+    private static int getClientName(SocketChannel client) {
+        return client.socket().getPort();
     }
 
     private boolean readyToQuit(String msg) {
