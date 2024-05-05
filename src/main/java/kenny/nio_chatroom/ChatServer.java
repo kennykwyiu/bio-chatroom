@@ -84,6 +84,13 @@ public class ChatServer {
 
     }
 
+    private String receive(SocketChannel client) throws IOException {
+        readBuffer.clear();
+        while ((client.read(readBuffer)) > 0);
+        readBuffer.flip();
+        return String.valueOf(charset.decode(readBuffer));
+    }
+
     private static int getClientName(SocketChannel client) {
         return client.socket().getPort();
     }
