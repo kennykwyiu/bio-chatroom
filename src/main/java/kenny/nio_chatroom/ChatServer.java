@@ -84,6 +84,24 @@ public class ChatServer {
 
     }
 
+    private void forwardMessage(SocketChannel client, String fwdMsg) throws IOException {
+        for (SelectionKey key : selector.keys()) {
+            Channel connectedClient = key.channel();
+            if (connectedClient instanceof SocketChannel) {
+                continue;
+            }
+
+            if (key.isValid() && !client.equals(connectedClient)) {
+                writeBuffer.clear();
+                writeBuffer.put(charset.encode("Clients[" + getClientName(client) + "]: " + fwdMsg));
+                writeBuffer.flip();
+                while (writeBuffer.hasRemaining()) {
+                    ((SocketChannel)connectedClient).write(writeBuffer);
+                }
+            }
+        }
+    }
+
     private String receive(SocketChannel client) throws IOException {
         readBuffer.clear();
         while ((client.read(readBuffer)) > 0);
