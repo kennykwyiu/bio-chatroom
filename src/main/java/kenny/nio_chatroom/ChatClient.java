@@ -2,11 +2,14 @@ package kenny.nio_chatroom;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 public class ChatClient {
     private final String DEFAULT_SERVER_HOST = "127.0.0.1";
@@ -48,6 +51,29 @@ public class ChatClient {
     }
 
     private void start() {
+        try {
+            client = SocketChannel.open();
+            client.configureBlocking(false);
+
+            selector = Selector.open();
+            client.register(selector, SelectionKey.OP_CONNECT);
+            client.connect(new InetSocketAddress(host, port));
+
+            while (true) {
+                selector.select();
+                Set<SelectionKey> selectionKeys = selector.selectedKeys();
+                for (SelectionKey key : selectionKeys) {
+                    handles(key);
+                }
+                selectionKeys.clear();
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void handles(SelectionKey key) {
 
     }
 }
