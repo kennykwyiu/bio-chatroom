@@ -76,12 +76,9 @@ public class ChatServer {
                     key.cancel();
                     selector.wakeup();
                     System.out.println("Server[" + getClientName(client) + "] is disconnected");
-
                 }
             }
-
         }
-
     }
 
     private void forwardMessage(SocketChannel client, String fwdMsg) throws IOException {
@@ -96,7 +93,7 @@ public class ChatServer {
                 writeBuffer.put(charset.encode("Clients[" + getClientName(client) + "]: " + fwdMsg));
                 writeBuffer.flip();
                 while (writeBuffer.hasRemaining()) {
-                    ((SocketChannel)connectedClient).write(writeBuffer);
+                    ((SocketChannel) connectedClient).write(writeBuffer);
                 }
             }
         }
@@ -104,7 +101,7 @@ public class ChatServer {
 
     private String receive(SocketChannel client) throws IOException {
         readBuffer.clear();
-        while ((client.read(readBuffer)) > 0);
+        while ((client.read(readBuffer)) > 0) ;
         readBuffer.flip();
         return String.valueOf(charset.decode(readBuffer));
     }
