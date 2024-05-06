@@ -4,10 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectableChannel;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
@@ -71,6 +68,9 @@ public class ChatClient {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (ClosedSelectorException e) {
+        } finally {
+            close(selector);
         }
     }
 
