@@ -1,5 +1,7 @@
 package kenny.nio_chatroom;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -20,4 +22,32 @@ public class ChatClient {
     private Selector selector;
     private Charset charset = StandardCharsets.UTF_8;
 
+    public ChatClient() {
+        this.host = DEFAULT_SERVER_HOST;
+        this.port = DEFAULT_SERVER_PORT;
+    }
+
+    public ChatClient(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    private boolean readyToQuit(String msg) {
+        return QUIT.equals(msg);
+    }
+
+    private void close(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+                System.out.println("Closing the " + closeable.getClass());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void start() {
+
+    }
 }
