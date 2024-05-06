@@ -105,5 +105,22 @@ public class ChatClient {
         return String.valueOf(charset.decode(readBuffer));
     }
 
+    public void send(String msg) throws IOException {
+        if (msg.isEmpty()) {
+            return;
+        }
 
+        writeBuffer.clear();
+        writeBuffer.put(charset.encode(msg));
+        writeBuffer.flip();
+        while (writeBuffer.hasRemaining()) {
+            client.write(writeBuffer);
+        }
+
+        // check user want to quit or not
+        if (readyToQuit(msg)) {
+            close(selector);
+        }
+
+    }
 }
