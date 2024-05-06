@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -35,7 +36,7 @@ public class ChatClient {
         this.port = port;
     }
 
-    private boolean readyToQuit(String msg) {
+    public boolean readyToQuit(String msg) {
         return QUIT.equals(msg);
     }
 
@@ -73,7 +74,36 @@ public class ChatClient {
         }
     }
 
-    private void handles(SelectionKey key) {
-
+    private void handles(SelectionKey key) throws IOException {
+        // CONNECT event - ready to connect event
+        if (key.isConnectable()) {
+            SocketChannel client = (SocketChannel) key.channel();
+            if (client.isConnectionPending()) {
+                client.finishConnect();
+                // handle user input
+                new Thread(new UserInputHandler(this)).start();
+            }
+            client.register(selector, SelectionKey.OP_READ);
+        }
+        // READ event - server forward msg
+        else if (key.isReadable()) {
+            SocketChannel client = (SocketChannel) key.channel();
+            String msg = receive(client);
+            if (msg.isEmpty()) {
+                // server error
+                close(selector);
+            } else {
+                System.out.println(msg);
+            }
+        }
     }
+
+    private String receive(SocketChannel client) throws IOException {
+        readBuffer.clear();
+        while (client.read(readBuffer) > 0);
+            readBuffer.flip();
+        return String.valueOf(charset.decode(readBuffer));
+    }
+
+
 }
