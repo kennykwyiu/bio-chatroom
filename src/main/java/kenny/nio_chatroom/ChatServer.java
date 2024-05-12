@@ -72,6 +72,7 @@ public class ChatServer {
                 key.cancel();
                 selector.wakeup();
             } else {
+                System.out.println(getClientName(client) + ":" + fwdMsg);
                 forwardMessage(client, fwdMsg);
 
                 // check client is quit or not?
