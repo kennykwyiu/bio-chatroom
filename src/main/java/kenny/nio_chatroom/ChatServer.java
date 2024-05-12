@@ -10,25 +10,26 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 public class ChatServer {
-    private int DEFAULT_PORT = 8888;
-    private final String QUIT = "quit";
+    private static final int DEFAULT_PORT = 8888;
+    private static final String QUIT = "quit";
     private static final int BUFFER = 1024;
+
     private ServerSocketChannel server;
     private Selector selector;
     private ByteBuffer readBuffer = ByteBuffer.allocate(BUFFER);
     private ByteBuffer writeBuffer = ByteBuffer.allocate(BUFFER);
-    private Charset charset = StandardCharsets.UTF_8;
+    private Charset charset = Charset.forName("UTF-8");
     private int port;
 
     public ChatServer() {
-        this.port = DEFAULT_PORT;
+        this(DEFAULT_PORT);
     }
 
     public ChatServer(int port) {
         this.port = port;
     }
 
-    private void Start() {
+    private void start() {
         try {
             server = ServerSocketChannel.open();
             server.configureBlocking(false);
@@ -56,10 +57,12 @@ public class ChatServer {
     private void handles(SelectionKey key) throws IOException {
         // ACCEPT event - with client server connected
         if (key.isAcceptable()) {
-            SocketChannel client = (SocketChannel) key.channel();
-            client.configureBlocking(false);
-            client.register(selector, SelectionKey.OP_READ);
-            System.out.println("Client[" + getClientName(client) + "] is connected");
+            ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
+            SocketChannel clientChannel = serverChannel.accept();
+            clientChannel.configureBlocking(false);
+            clientChannel.register(selector, SelectionKey.OP_READ);
+//            System.out.println(getClientName(clientChannel) + " connected.");
+            System.out.println("Client[" + getClientName(clientChannel) + "] is connected");
         }
         // READ event - clients send msg to server
         else if (key.isReadable()) {
@@ -84,7 +87,7 @@ public class ChatServer {
     private void forwardMessage(SocketChannel client, String fwdMsg) throws IOException {
         for (SelectionKey key : selector.keys()) {
             Channel connectedClient = key.channel();
-            if (connectedClient instanceof SocketChannel) {
+            if (connectedClient instanceof ServerSocketChannel) {
                 continue;
             }
 
@@ -101,12 +104,12 @@ public class ChatServer {
 
     private String receive(SocketChannel client) throws IOException {
         readBuffer.clear();
-        while ((client.read(readBuffer)) > 0) ;
+        while (client.read(readBuffer) > 0) ;
         readBuffer.flip();
         return String.valueOf(charset.decode(readBuffer));
     }
 
-    private static int getClientName(SocketChannel client) {
+    private int getClientName(SocketChannel client) {
         return client.socket().getPort();
     }
 
@@ -114,14 +117,19 @@ public class ChatServer {
         return QUIT.equals(msg);
     }
 
-    private void close(Closeable closeable) {
-        if (closeable != null) {
+    private void close(Closeable closable) {
+        if (closable != null) {
             try {
-                closeable.close();
-                System.out.println("Closing the " + closeable.getClass());
+                closable.close();
+                System.out.println("Closing the " + closable.getClass());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        ChatServer server = new ChatServer(8888);
+        server.start();
     }
 }

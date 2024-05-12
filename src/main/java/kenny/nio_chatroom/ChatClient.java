@@ -124,7 +124,7 @@ public class ChatClient {
     }
 
     public static void main(String[] args) {
-        ChatClient chatClient = new ChatClient("127.0.0.1", 7777);
+        ChatClient chatClient = new ChatClient("127.0.0.1", 8888);
         chatClient.start();
     }
 }
